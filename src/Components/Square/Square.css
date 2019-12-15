@@ -1,0 +1,27 @@
+.square {
+  width: 125px;
+  height: 125px;
+  background-color: darkgray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.square:nth-child(odd) {
+  background-color: white;
+}
+
+.odd-row-square {
+  width: 125px;
+  height: 125px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.odd-row-square:nth-child(odd) {
+  background-color: darkgray;
+}

@@ -1,0 +1,11 @@
+.board-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  width: 1000px;
+  height: 1000px;
+  background-color: blue;
+  border: 7px solid black;
+}
