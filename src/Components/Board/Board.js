@@ -12,8 +12,16 @@ const Board = props => {
     });
 
   var rows = [];
-  for (var i = 0; i <= 64; i = i + 8) {
-    rows.push(<Row onDrop={onDrop} squares={squares} id={i} pieces={pieces} />);
+  for (var i = 0; i < 64; i = i + 8) {
+    rows.push(
+      <Row
+        onDrop={onDrop}
+        squares={squares}
+        id={i}
+        pieces={pieces}
+        rowId={i / 8 + 1}
+      />
+    );
   }
 
   return <div className="board-container">{rows}</div>;

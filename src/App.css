@@ -6,3 +6,8 @@
 .App {
   text-align: center;
 }
+
+#turn-indicator {
+  font-size: 50px;
+  border: 1px solid black;
+}

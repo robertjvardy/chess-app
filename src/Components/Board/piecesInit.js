@@ -11,7 +11,7 @@ import {
   blackKnight,
   blackKing,
   blackQueen
-} from "../../piecesMap";
+} from "../../utils/piecesMap";
 
 export const piecesInit = () => {
   const pieces = [
