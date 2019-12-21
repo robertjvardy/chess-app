@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import Board from "./Components/Board/Board";
 import NavBar from "./Components/NavBar/NavBar";
 import { piecesInit } from "./Components/Board/piecesInit";
-import { validMove, boardInit } from "./utils/utils";
+import { isValidMove, boardInit, getValidMoves } from "./utils/utils";
+import _ from "lodash";
 import "./App.css";
-import Square from "./Components/Square/Square";
 
 const App = () => {
   let squares = boardInit();
   const [pieces, setPieces] = useState(piecesInit());
+  const [attackingOptions, setAttackingOptions] = useState([]);
+  const [displayingForPosition, setDisplayingForPosition] = useState();
   const [graveyard, setGraveyard] = useState([]);
   const [moveCount, setMoveCount] = useState(0);
   const getOccupier = (x, y) => {
@@ -42,7 +44,7 @@ const App = () => {
     if (
       (attackedPiece !== undefined &&
         attackedPiece["player"] === attackingPiece["player"]) ||
-      !validMove(from, to, attackingPiece.type, isOccupied, getOccupier) ||
+      !isValidMove(from, to, attackingPiece.type, isOccupied, getOccupier) ||
       !isPlayersTurn(attackingPiece)
     ) {
       return;
@@ -64,13 +66,70 @@ const App = () => {
     });
     setPieces(newPositions.filter(piece => piece.status === "alive"));
     setMoveCount(moveCount + 1);
+    setAttackingOptions([]);
+  };
+
+  const handlePieceClick = (from, position) => {
+    const attackingPiece = pieces.find(piece => piece.position === position);
+    if (!isPlayersTurn(attackingPiece)) return;
+    if (
+      _.isEqual(displayingForPosition, position) &&
+      attackingOptions.length > 0
+    ) {
+      setDisplayingForPosition(position);
+      return setAttackingOptions([]);
+    } else {
+      setDisplayingForPosition(position);
+      const { type } = getOccupier(from.x, from.y);
+      setAttackingOptions(getValidMoves(from, type, isOccupied, getOccupier));
+    }
+  };
+
+  const handleMoveOptionClick = attackedPosition => {
+    const attackedPiece = pieces.find(
+      piece => piece.position == attackedPosition
+    );
+    const attackingPiece = pieces.find(
+      piece => piece.position === displayingForPosition
+    );
+    let newPositions = pieces.map(piece => {
+      if (piece === attackedPiece) {
+        const newPiece = piece;
+        newPiece["status"] = "dead";
+        setGraveyard(graveyard.concat(newPiece));
+        return newPiece;
+      }
+      if (piece === attackingPiece) {
+        const newPiece = { ...attackingPiece };
+        newPiece["position"] = attackedPosition;
+        return newPiece;
+      } else {
+        return piece;
+      }
+    });
+    setPieces(newPositions.filter(piece => piece.status === "alive"));
+    setMoveCount(moveCount + 1);
+    setAttackingOptions([]);
+  };
+
+  const resetBoard = () => {
+    setPieces(piecesInit());
+    setAttackingOptions([]);
+    setDisplayingForPosition();
   };
 
   return (
     <div className="App">
-      <NavBar setPieces={setPieces} />
+      <NavBar resetBoard={resetBoard} />
       <div className="main-container">
-        <Board pieces={pieces} squares={squares} onDrop={onDrop} />
+        <Board
+          pieces={pieces}
+          attackingOptions={attackingOptions}
+          squares={squares}
+          onDrop={onDrop}
+          handlePieceClick={handlePieceClick}
+          handleMoveOptionClick={handleMoveOptionClick}
+        />
         <div id="turn-indicator">
           <p>Turn: {moveCount % 2 == 0 ? "White" : "Black"}</p>
         </div>

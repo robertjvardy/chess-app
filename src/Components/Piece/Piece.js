@@ -2,7 +2,7 @@ import React from "react";
 import "./Piece.css";
 
 const Piece = props => {
-  const { id, occupierType, position, rowId } = props;
+  const { id, occupierType, position, rowId, handlePieceClick } = props;
   const onDragStart = (event, id) => {
     event.dataTransfer.setData("id", id);
     event.dataTransfer.setData("fromPosition", position);
@@ -18,16 +18,15 @@ const Piece = props => {
     event.target.style.background = "";
     event.target.style.opacity = 1;
   };
+  let fromPosition = position % 8 === 0 ? 8 : position % 8;
+  let from = { x: fromPosition, y: rowId };
   return (
     <div
       onDragStart={event => onDragStart(event, id)}
       onDragEnd={event => onDragEnd(event)}
       draggable
       className="piece"
-      onClick={event => {
-        if (occupierType !== undefined)
-          console.log("display valid moves for: ", occupierType);
-      }}
+      onClick={event => handlePieceClick(from, position)}
     >
       <div
         className="icon"

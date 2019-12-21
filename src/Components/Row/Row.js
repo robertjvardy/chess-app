@@ -3,7 +3,16 @@ import Square from "../Square/Square";
 import "./Row.css";
 
 const Row = props => {
-  const { onDrop, squares, id, pieces, rowId } = props;
+  const {
+    onDrop,
+    squares,
+    id,
+    pieces,
+    attackingOptions,
+    rowId,
+    handlePieceClick,
+    handleMoveOptionClick
+  } = props;
   return (
     <div id={rowId} className="row">
       {Object.keys(squares)
@@ -14,8 +23,11 @@ const Row = props => {
             occupierId={squares[square]["id"]}
             onDrop={onDrop}
             pieces={pieces}
+            attackingOptions={attackingOptions}
             classname={id % 16 === 0 ? "square" : "odd-row-square"}
             rowId={rowId}
+            handlePieceClick={handlePieceClick}
+            handleMoveOptionClick={handleMoveOptionClick}
           />
         ))}
     </div>

@@ -1,18 +1,34 @@
 import React from "react";
 import Piece from "../Piece/Piece";
 import "./Square.css";
-import { squares } from "../../utils/utils";
-
+import { isUndefined } from "lodash";
+import AttackOption from "../AttackOption/AttackOption";
 const Square = props => {
-  const { squareNumber, onDrop, occupierId, classname, pieces, rowId } = props;
+  const {
+    squareNumber,
+    onDrop,
+    occupierId,
+    classname,
+    pieces,
+    attackingOptions,
+    rowId,
+    handlePieceClick,
+    handleMoveOptionClick
+  } = props;
   const onDragOver = event => event.preventDefault();
   const occupier = pieces.find(piece => piece.id == occupierId);
+  const attackOption = !isUndefined(
+    attackingOptions.find(
+      option =>
+        option.y === rowId && option.x + (option.y - 1) * 8 === squareNumber
+    )
+  );
+
   return (
     <div
       className={classname}
       onDragOver={event => onDragOver(event)}
       onDrop={event => onDrop(event, squareNumber, rowId)}
-      // onClick={event => (event.target.style.opacity = 0.5)}
     >
       {occupierId ? (
         <Piece
@@ -20,6 +36,13 @@ const Square = props => {
           position={squareNumber}
           occupierType={occupier["type"]}
           rowId={rowId}
+          handlePieceClick={handlePieceClick}
+        />
+      ) : null}
+      {attackOption ? (
+        <AttackOption
+          handleMoveOptionClick={handleMoveOptionClick}
+          position={squareNumber}
         />
       ) : null}
     </div>

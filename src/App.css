@@ -9,5 +9,8 @@
 
 #turn-indicator {
   font-size: 50px;
-  border: 1px solid black;
+  border: 4px solid black;
+  display: inline-block;
+  padding: 20px;
+  margin: 40px;
 }

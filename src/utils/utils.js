@@ -7,7 +7,26 @@ export const boardInit = () => {
   return squares;
 };
 
-export const validMove = (from, to, type, isOccupied, getOccupier) => {
+export const getValidMoves = (from, type, isOccupied, getOccupier) => {
+  switch (true) {
+    case type === pieces.whitePawn || type === pieces.blackPawn:
+      return generateValidPawnMoves(from, type, isOccupied, getOccupier);
+    case type === pieces.whiteKnight || type === pieces.blackKnight:
+      return generateValidKnightMoves(from, type, isOccupied, getOccupier);
+    case type === pieces.whiteRook || type === pieces.blackRook:
+      return generateValidRookMoves(from, type, isOccupied, getOccupier);
+    case type === pieces.whiteBishop || type === pieces.blackBishop:
+      return generateValidBishopMoves(from, type, isOccupied, getOccupier);
+    case type === pieces.whiteKing || type === pieces.blackKing:
+      return generateValidKingMoves(from, type, isOccupied, getOccupier);
+    case type === pieces.whiteQueen || type === pieces.blackQueen:
+      return generateValidQueenMoves(from, type, isOccupied, getOccupier);
+    default:
+      return [];
+  }
+};
+
+export const isValidMove = (from, to, type, isOccupied, getOccupier) => {
   switch (true) {
     case type === pieces.whitePawn || type === pieces.blackPawn:
       let pawnMoveOptions = generateValidPawnMoves(
@@ -69,9 +88,141 @@ export const validMove = (from, to, type, isOccupied, getOccupier) => {
         if (_.isEqual(option, to)) isValidKingMove = true;
       });
       return kingMoveOptions.length ? isValidKingMove : false;
+    case type === pieces.whiteQueen || type === pieces.blackQueen:
+      let queenMoveOptions = generateValidQueenMoves(
+        from,
+        type,
+        isOccupied,
+        getOccupier
+      );
+      let isValidQueenMove = false;
+      queenMoveOptions.forEach(option => {
+        if (_.isEqual(option, to)) isValidQueenMove = true;
+      });
+      return queenMoveOptions.length ? isValidQueenMove : false;
     default:
       return false;
   }
+};
+
+const generateValidHorizontalMoves = (
+  from,
+  opponent,
+  isOccupied,
+  getOccupier
+) => {
+  let attackingSquares = [];
+  for (let i = from.x + 1; i <= 8; i++) {
+    if (isOccupied(i, from.y) && getOccupier(i, from.y).player === opponent) {
+      attackingSquares = attackingSquares.concat({ x: i, y: from.y });
+      break;
+    }
+    if (isOccupied(i, from.y) && getOccupier(i, from.y).player !== opponent) {
+      break;
+    } else {
+      attackingSquares = attackingSquares.concat({ x: i, y: from.y });
+    }
+  }
+  for (let i = from.x - 1; i > 0; i--) {
+    if (isOccupied(i, from.y) && getOccupier(i, from.y).player === opponent) {
+      attackingSquares = attackingSquares.concat({ x: i, y: from.y });
+      break;
+    }
+    if (isOccupied(i, from.y) && getOccupier(i, from.y).player !== opponent) {
+      break;
+    } else {
+      attackingSquares = attackingSquares.concat({ x: i, y: from.y });
+    }
+  }
+  return attackingSquares;
+};
+
+const generateValidVerticalMoves = (
+  from,
+  opponent,
+  isOccupied,
+  getOccupier
+) => {
+  let attackingSquares = [];
+  for (let i = from.y + 1; i <= 8; i++) {
+    if (isOccupied(from.x, i) && getOccupier(from.x, i).player === opponent) {
+      attackingSquares = attackingSquares.concat({ x: from.x, y: i });
+      break;
+    }
+    if (isOccupied(from.x, i) && getOccupier(from.x, i).player !== opponent) {
+      break;
+    } else {
+      attackingSquares = attackingSquares.concat({ x: from.x, y: i });
+    }
+  }
+  for (let i = from.y - 1; i > 0; i--) {
+    if (isOccupied(from.x, i) && getOccupier(from.x, i).player === opponent) {
+      attackingSquares = attackingSquares.concat({ x: from.x, y: i });
+      break;
+    }
+    if (isOccupied(from.x, i) && getOccupier(from.x, i).player !== opponent) {
+      break;
+    } else {
+      attackingSquares = attackingSquares.concat({ x: from.x, y: i });
+    }
+  }
+  return attackingSquares;
+};
+
+const generateValidDiagonalMoves = (
+  from,
+  opponent,
+  isOccupied,
+  getOccupier
+) => {
+  let attackingSquares = [];
+  let i, j;
+  for (i = from.x + 1, j = from.y - 1; i <= 8 && j > 0; i++, j--) {
+    if (isOccupied(i, j) && getOccupier(i, j).player === opponent) {
+      attackingSquares = attackingSquares.concat({ x: i, y: j });
+      break;
+    }
+    if (isOccupied(i, j) && getOccupier(i, j).player !== opponent) {
+      break;
+    } else {
+      attackingSquares = attackingSquares.concat({ x: i, y: j });
+    }
+  }
+  for (i = from.x - 1, j = from.y + 1; i > 0 && j <= 8; i--, j++) {
+    if (isOccupied(i, j) && getOccupier(i, j).player === opponent) {
+      attackingSquares = attackingSquares.concat({ x: i, y: j });
+      break;
+    }
+    if (isOccupied(i, j) && getOccupier(i, j).player !== opponent) {
+      break;
+    } else {
+      attackingSquares = attackingSquares.concat({ x: i, y: j });
+    }
+  }
+  for (i = from.x + 1, j = from.y + 1; i <= 8 && j <= 8; i++, j++) {
+    if (isOccupied(i, j) && getOccupier(i, j).player === opponent) {
+      attackingSquares = attackingSquares.concat({ x: i, y: j });
+      break;
+    }
+    if (isOccupied(i, j) && getOccupier(i, j).player !== opponent) {
+      break;
+    } else {
+      attackingSquares = attackingSquares.concat({ x: i, y: j });
+    }
+  }
+
+  for (i = from.x - 1, j = from.y - 1; i > 0 && j > 0; i--, j--) {
+    if (isOccupied(i, j) && getOccupier(i, j).player === opponent) {
+      attackingSquares = attackingSquares.concat({ x: i, y: j });
+      break;
+    }
+    if (isOccupied(i, j) && getOccupier(i, j).player !== opponent) {
+      break;
+    } else {
+      attackingSquares = attackingSquares.concat({ x: i, y: j });
+    }
+  }
+  return attackingSquares;
 };
 
 const generateValidPawnMoves = (from, type, isOccupied, getOccupier) => {
@@ -145,106 +296,21 @@ const generateValidKnightMoves = (from, type, isOccupied, getOccupier) => {
 const generateValidRookMoves = (from, type, isOccupied, getOccupier) => {
   const opponent = type === pieces.whiteRook ? 2 : 1;
   let attackingSquares = [];
-
-  for (let i = from.y + 1; i <= 8; i++) {
-    if (isOccupied(from.x, i) && getOccupier(from.x, i).player === opponent) {
-      attackingSquares = attackingSquares.concat({ x: from.x, y: i });
-      break;
-    }
-    if (isOccupied(from.x, i) && getOccupier(from.x, i).player !== opponent) {
-      break;
-    } else {
-      attackingSquares = attackingSquares.concat({ x: from.x, y: i });
-    }
-  }
-  for (let i = from.y - 1; i > 0; i--) {
-    if (isOccupied(from.x, i) && getOccupier(from.x, i).player === opponent) {
-      attackingSquares = attackingSquares.concat({ x: from.x, y: i });
-      break;
-    }
-    if (isOccupied(from.x, i) && getOccupier(from.x, i).player !== opponent) {
-      break;
-    } else {
-      attackingSquares = attackingSquares.concat({ x: from.x, y: i });
-    }
-  }
-
-  for (let i = from.x + 1; i <= 8; i++) {
-    if (isOccupied(i, from.y) && getOccupier(i, from.y).player === opponent) {
-      attackingSquares = attackingSquares.concat({ x: i, y: from.y });
-      break;
-    }
-    if (isOccupied(i, from.y) && getOccupier(i, from.y).player !== opponent) {
-      break;
-    } else {
-      attackingSquares = attackingSquares.concat({ x: i, y: from.y });
-    }
-  }
-  for (let i = from.x - 1; i > 0; i--) {
-    if (isOccupied(i, from.y) && getOccupier(i, from.y).player === opponent) {
-      attackingSquares = attackingSquares.concat({ x: i, y: from.y });
-      break;
-    }
-    if (isOccupied(i, from.y) && getOccupier(i, from.y).player !== opponent) {
-      break;
-    } else {
-      attackingSquares = attackingSquares.concat({ x: i, y: from.y });
-    }
-  }
+  generateValidVerticalMoves(from, opponent, isOccupied, getOccupier).forEach(
+    pair => (attackingSquares = attackingSquares.concat(pair))
+  );
+  generateValidHorizontalMoves(from, opponent, isOccupied, getOccupier).forEach(
+    pair => (attackingSquares = attackingSquares.concat(pair))
+  );
   return attackingSquares;
 };
 
 const generateValidBishopMoves = (from, type, isOccupied, getOccupier) => {
   let attackingSquares = [];
   const opponent = type === pieces.whiteBishop ? 2 : 1;
-  if (type === pieces.whiteBishop || type === pieces.blackBishop) {
-    let i, j;
-    for (i = from.x + 1, j = from.y - 1; i <= 8 && j > 0; i++, j--) {
-      if (isOccupied(i, j) && getOccupier(i, j).player === opponent) {
-        attackingSquares = attackingSquares.concat({ x: i, y: j });
-        break;
-      }
-      if (isOccupied(i, j) && getOccupier(i, j).player !== opponent) {
-        break;
-      } else {
-        attackingSquares = attackingSquares.concat({ x: i, y: j });
-      }
-    }
-    for (i = from.x - 1, j = from.y + 1; i > 0 && j <= 8; i--, j++) {
-      if (isOccupied(i, j) && getOccupier(i, j).player === opponent) {
-        attackingSquares = attackingSquares.concat({ x: i, y: j });
-        break;
-      }
-      if (isOccupied(i, j) && getOccupier(i, j).player !== opponent) {
-        break;
-      } else {
-        attackingSquares = attackingSquares.concat({ x: i, y: j });
-      }
-    }
-    for (i = from.x + 1, j = from.y + 1; i <= 8 && j <= 8; i++, j++) {
-      if (isOccupied(i, j) && getOccupier(i, j).player === opponent) {
-        attackingSquares = attackingSquares.concat({ x: i, y: j });
-        break;
-      }
-      if (isOccupied(i, j) && getOccupier(i, j).player !== opponent) {
-        break;
-      } else {
-        attackingSquares = attackingSquares.concat({ x: i, y: j });
-      }
-    }
-
-    for (i = from.x - 1, j = from.y - 1; i > 0 && j > 0; i--, j--) {
-      if (isOccupied(i, j) && getOccupier(i, j).player === opponent) {
-        attackingSquares = attackingSquares.concat({ x: i, y: j });
-        break;
-      }
-      if (isOccupied(i, j) && getOccupier(i, j).player !== opponent) {
-        break;
-      } else {
-        attackingSquares = attackingSquares.concat({ x: i, y: j });
-      }
-    }
-  }
+  generateValidDiagonalMoves(from, opponent, isOccupied, getOccupier).forEach(
+    pair => (attackingSquares = attackingSquares.concat(pair))
+  );
   return attackingSquares;
 };
 
@@ -262,6 +328,31 @@ const generateValidKingMoves = (from, type, isOccupied, getOccupier) => {
       }
     }
   }
+  attackingSquares.forEach(square => {
+    if (
+      (isOccupied(square.x, square.y) &&
+        getOccupier(square.x, square.y).player === opponent) ||
+      !isOccupied(square.x, square.y)
+    ) {
+      validMoves = validMoves.concat(square);
+    }
+  });
+  return validMoves;
+};
+
+const generateValidQueenMoves = (from, type, isOccupied, getOccupier) => {
+  let validMoves = [];
+  let attackingSquares = [];
+  const opponent = type === pieces.whiteQueen ? 2 : 1;
+  generateValidDiagonalMoves(from, opponent, isOccupied, getOccupier).forEach(
+    pair => (attackingSquares = attackingSquares.concat(pair))
+  );
+  generateValidVerticalMoves(from, opponent, isOccupied, getOccupier).forEach(
+    pair => (attackingSquares = attackingSquares.concat(pair))
+  );
+  generateValidHorizontalMoves(from, opponent, isOccupied, getOccupier).forEach(
+    pair => (attackingSquares = attackingSquares.concat(pair))
+  );
   attackingSquares.forEach(square => {
     if (
       (isOccupied(square.x, square.y) &&

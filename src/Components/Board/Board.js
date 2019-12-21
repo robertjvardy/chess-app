@@ -3,7 +3,14 @@ import Row from "../Row/Row";
 import "./Board.css";
 
 const Board = props => {
-  const { pieces, squares, onDrop } = props;
+  const {
+    pieces,
+    attackingOptions,
+    squares,
+    onDrop,
+    handlePieceClick,
+    handleMoveOptionClick
+  } = props;
 
   pieces
     .filter(piece => piece.status === "alive")
@@ -19,7 +26,10 @@ const Board = props => {
         squares={squares}
         id={i}
         pieces={pieces}
+        attackingOptions={attackingOptions}
         rowId={i / 8 + 1}
+        handlePieceClick={handlePieceClick}
+        handleMoveOptionClick={handleMoveOptionClick}
       />
     );
   }
