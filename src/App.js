@@ -116,6 +116,7 @@ const App = () => {
     setPieces(piecesInit());
     setAttackingOptions([]);
     setDisplayingForPosition();
+    setMoveCount(0);
   };
 
   return (
